@@ -15,7 +15,10 @@ def test_auth_app(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def protected_test(request):
-    return Response({'status': 'JWT authentication works', 'user': request.user.email})
+    return Response({
+        "status": "JWT authentication works",
+        "user": request.user.email
+    })
 
 @api_view(['POST'])
 def register_user(request):
