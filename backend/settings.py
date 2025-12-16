@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',    # DRF
+    'auth_app',          # our auth app
 ]
 
 MIDDLEWARE = [
