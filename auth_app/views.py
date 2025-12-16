@@ -20,6 +20,7 @@ def protected_test(request):
         "user": request.user.email
     })
 
+
 @api_view(['POST'])
 def register_user(request):
     serializer = UserRegistrationSerializer(data=request.data)
