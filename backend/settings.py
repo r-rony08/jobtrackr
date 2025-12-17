@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',    # DRF
     'auth_app',          # our auth app
+    'profiles.apps.ProfilesConfig',
 ]
 
 MIDDLEWARE = [
