@@ -36,5 +36,19 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
+    USER = 'user'
+    RECRUITER = 'recruiter'
+
+    ROLE_CHOICES = (
+        (USER, 'User'),
+        (RECRUITER, 'Recruiter'),
+    )
+
+    role = models.CharField(
+        max_length=20,
+        choices=ROLE_CHOICES,
+        default=USER
+    )
+
     def __str__(self):
         return self.email
