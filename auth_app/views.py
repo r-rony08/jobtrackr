@@ -7,6 +7,7 @@ from rest_framework import status
 from .serializers import UserRegistrationSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import MyTokenObtainPairSerializer
+from .permissions import IsRecruiter
 # Create your views here.
 
 def test_auth_app(request):
@@ -34,7 +35,15 @@ def register_user(request):
         }, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-## 2️⃣ Create Custom Login View
+# Create Custom Login View
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsRecruiter])
+def recruiter_test(request):
+    return Response({
+        "message": "Recruiter access granted"
+    })
