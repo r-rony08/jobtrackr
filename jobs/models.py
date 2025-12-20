@@ -21,22 +21,23 @@ class Job(models.Model):
         related_name='jobs'
     )
 
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, db_index=True)
     description = models.TextField()
 
-    location = models.CharField(max_length=255)
+    location = models.CharField(max_length=255, db_index=True)
     job_type = models.CharField(
         max_length=20,
-        choices=JOB_TYPE_CHOICES
+        choices=JOB_TYPE_CHOICES,
+        db_index=True
     )
 
     salary = models.PositiveIntegerField(
         null=True, blank=True
     )
 
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True, db_index=True)
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
 
     def __str__(self):
         return self.title
