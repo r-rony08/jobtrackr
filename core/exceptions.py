@@ -1,0 +1,28 @@
+from rest_framework.views import exception_handler
+from rest_framework.response import Response
+from rest_framework import status
+
+
+def custom_exception_handler(exc, context):
+    response = exception_handler(exc, context)
+
+    # If DRF handled the exception
+    if response is not None:
+        return Response(
+            {
+                "success": False,
+                "data": response.data,
+                "message": "Request failed",
+            },
+            status=response.status_code,
+        )
+
+    # If it's an unhandled exception
+    return Response(
+        {
+            "success": False,
+            "data": None,
+            "message": "Internal server error",
+        },
+        status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+    )

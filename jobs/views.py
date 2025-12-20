@@ -3,6 +3,9 @@ from rest_framework.permissions import IsAuthenticated,AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
+from rest_framework.pagination import PageNumberPagination
+from core.utils.api_response import api_response   
+from django.core.cache import cache
 
 from .models import Job
 from .serializers import JobSerializer
@@ -19,6 +22,8 @@ def create_job(request):
     serializer.is_valid(raise_exception=True)
 
     serializer.save(recruiter=request.user)
+    cache.clear()
+
 
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -28,9 +33,37 @@ def create_job(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def list_jobs(request):
-    jobs = Job.objects.filter(is_active=True).order_by('-created_at')
-    serializer = JobSerializer(jobs, many=True)
-    return Response(serializer.data)
+    cache_key = "jobs:list"
+    cached_data = cache.get(cache_key)
+    if cached_data:
+        return Response(cached_data)
+
+    jobs = (
+        Job.objects
+        .select_related('recruiter')
+        .filter(is_active=True)
+        .order_by('-created_at')
+    )
+
+    # Pagination
+    paginator = PageNumberPagination()
+    paginator.page_size = 10
+    result_page = paginator.paginate_queryset(jobs, request)
+
+    serializer = JobSerializer(result_page, many=True)
+    cache.set(cache_key, serializer.data, timeout=300)
+    return api_response(
+        success=True,
+        data={
+            "count": paginator.page.paginator.count,
+            "next": paginator.get_next_link(),
+            "previous": paginator.get_previous_link(),
+            "results": serializer.data
+        },
+        message="Jobs retrieved successfully",
+        status=200
+    )
+
 
 
 # Update Jobs
@@ -47,8 +80,16 @@ def update_job(request, job_id):
     )
     serializer.is_valid(raise_exception=True)
     serializer.save()
+    cache.clear()
 
-    return Response(serializer.data)
+
+    return api_response(
+    success=True,
+    data=serializer.data,
+    message="Job updated successfully",
+    status=status.HTTP_200_OK
+)
+
 
 # Delete Jobs
 
@@ -58,44 +99,55 @@ def delete_job(request, job_id):
     job = get_object_or_404(Job, id=job_id)
     job.is_active = False
     job.save()
+    cache.clear()
 
-    return Response(
-        {"message": "Job deactivated"},
-        status=status.HTTP_204_NO_CONTENT
-    )
+
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 ## Search & Filter Jobs
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def search_jobs(request):
-    jobs = Job.objects.all()
+    query_string = request.META.get("QUERY_STRING", "")
+    cache_key = f"jobs:search:{query_string}"
 
-    # Only active jobs
+    cached_data = cache.get(cache_key)
+    if cached_data:
+        return Response(cached_data)
+
+    jobs = Job.objects.select_related('recruiter')
+
     is_active = request.GET.get('is_active', 'true').lower() == 'true'
     jobs = jobs.filter(is_active=is_active)
 
-    # Filter by title
     title = request.GET.get('title')
     if title:
         jobs = jobs.filter(title__icontains=title)
 
-    # Filter by location
     location = request.GET.get('location')
     if location:
         jobs = jobs.filter(location__icontains=location)
 
-    # Filter by job_type
-    job_type = request.GET.get('job_type')
-    if job_type in dict(Job.JOB_TYPE_CHOICES):
-        jobs = jobs.filter(job_type=job_type)
-
-    # Sort by created_at
-    sort = request.GET.get('sort', 'desc')
-    if sort == 'asc':
-        jobs = jobs.order_by('created_at')
-    else:
-        jobs = jobs.order_by('-created_at')
-
     serializer = JobSerializer(jobs, many=True)
-    return Response(serializer.data)
+    cache.set(cache_key, serializer.data, 300)
+
+    # Pagination
+    paginator = PageNumberPagination()
+    paginator.page_size = 10
+    result_page = paginator.paginate_queryset(jobs, request)
+
+    serializer = JobSerializer(result_page, many=True)
+
+    return api_response(
+        success=True,
+        data={
+            "count": paginator.page.paginator.count,
+            "next": paginator.get_next_link(),
+            "previous": paginator.get_previous_link(),
+            "results": serializer.data
+        },
+        message="Jobs retrieved successfully",
+        status=200
+    )
