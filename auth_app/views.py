@@ -15,9 +15,6 @@ from .throttles import AuthThrottle, LoginThrottle
 
 # Create your views here.
 
-def test_auth_app(request):
-    return JsonResponse({'status': 'auth_app is working'})
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def protected_test(request):
