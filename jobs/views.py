@@ -6,6 +6,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework.pagination import PageNumberPagination
 from core.utils.api_response import api_response   
 from django.core.cache import cache
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 
 from .models import Job
 from .serializers import JobSerializer
