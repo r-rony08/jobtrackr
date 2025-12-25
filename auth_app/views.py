@@ -1,55 +1,91 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,AllowAny
 from rest_framework.response import Response
-from rest_framework import status
-from .serializers import UserRegistrationSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .serializers import MyTokenObtainPairSerializer
+from rest_framework import status
+from rest_framework.decorators import throttle_classes
+from rest_framework.views import APIView
+from .serializers import UserRegistrationSerializer, MyTokenObtainPairSerializer
 from .permissions import IsRecruiter
 from core.utils.api_response import api_response
-from rest_framework.decorators import throttle_classes
 from .throttles import AuthThrottle, LoginThrottle
-
+from profiles.models import UserProfile
+from drf_spectacular.utils import extend_schema
 
 # Create your views here.
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def protected_test(request):
-    return api_response(
-    success=True,
-    data={
-        "user": request.user.email
-    },
-    message="JWT authentication works",
-    status=status.HTTP_200_OK
-)
+class ProtectedTestView(APIView):
+    permission_classes = [IsAuthenticated]
 
-
-@api_view(['POST'])
-@throttle_classes([AuthThrottle])
-def register_user(request):
-    serializer = UserRegistrationSerializer(data=request.data)
-    if serializer.is_valid():
-        user = serializer.save()
+    @extend_schema(
+        responses={
+            200: {
+                "type": "object",
+                "properties": {
+                    "success": {"type": "boolean"},
+                    "data": {
+                        "type": "object",
+                        "properties": {
+                            "user": {"type": "string"}
+                        }
+                    },
+                    "message": {"type": "string"}
+                }
+            }
+        }
+    )
+    def get(self, request):
         return api_response(
-    success=True,
-    data={
-        "email": user.email,
-        "first_name": user.first_name,
-        "last_name": user.last_name
-    },
-    message="User registered successfully",
-    status=status.HTTP_201_CREATED
-)
-    return api_response(
-    success=False,
-    data=serializer.errors,
-    message="Validation error",
-    status=status.HTTP_400_BAD_REQUEST
-)
+            success=True,
+            data={"user": request.user.email},
+            message="JWT authentication works",
+            status=status.HTTP_200_OK
+        )
+
+
+class RegisterUserView(APIView):
+    permission_classes = [AllowAny]
+    throttle_classes = [AuthThrottle]  
+
+    @extend_schema(
+        request=UserRegistrationSerializer,
+        responses={201: UserRegistrationSerializer}
+    )
+    def post(self, request):
+        serializer = UserRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+
+            # auto-create profile
+            UserProfile.objects.get_or_create(
+                user=user,
+                defaults={
+                    "full_name": f"{user.first_name} {user.last_name}",
+                    "phone": "",
+                    "location": "",
+                    "bio": ""
+                }
+            )
+
+            return Response({
+                "success": True,
+                "data": {
+                    "email": user.email,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "role": user.role
+                },
+                "message": "User registered successfully"
+            }, status=status.HTTP_201_CREATED)
+
+        return Response({
+            "success": False,
+            "data": serializer.errors,
+            "message": "Validation error"
+        }, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 # Create Custom Login View
@@ -59,13 +95,26 @@ class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated, IsRecruiter])
-def recruiter_test(request):
-    return api_response(
-    success=True,
-    data=None,
-    message="Recruiter access granted",
-    status=status.HTTP_200_OK
-)
+class RecruiterTestView(APIView):
+    permission_classes = [IsAuthenticated, IsRecruiter]
+
+    @extend_schema(
+        responses={
+            200: {
+                "type": "object",
+                "properties": {
+                    "success": {"type": "boolean"},
+                    "data": {"type": "null"},
+                    "message": {"type": "string"}
+                }
+            }
+        }
+    )
+    def get(self, request):
+        return api_response(
+            success=True,
+            data=None,
+            message="Recruiter access granted",
+            status=status.HTTP_200_OK
+        )
 

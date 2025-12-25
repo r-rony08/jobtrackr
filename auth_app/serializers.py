@@ -4,10 +4,6 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=6)
-    role = serializers.ChoiceField(
-        choices=CustomUser.ROLE_CHOICES,
-        default=CustomUser.USER
-    )
 
     class Meta:
         model = CustomUser
@@ -20,24 +16,25 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             first_name=validated_data.get('first_name', ''),
             last_name=validated_data.get('last_name', '')
         )
+        user.role = validated_data.get('role', CustomUser.USER)
+        user.save()
         return user
 
-
-## 1️⃣ Create Custom Token Serializer (Optional but Professional)
-
+# Custom JWT Serializer to return user info
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-        # Add custom claims if needed
         token['email'] = user.email
+        token['role'] = user.role
         return token
 
     def validate(self, attrs):
         data = super().validate(attrs)
         data['user'] = {
-            'email': self.user.email,
-            'first_name': self.user.first_name,
-            'last_name': self.user.last_name
+            "email": self.user.email,
+            "first_name": self.user.first_name,
+            "last_name": self.user.last_name,
+            "role": self.user.role
         }
         return data

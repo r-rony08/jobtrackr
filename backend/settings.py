@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'jobs',
     'applications',
     'frontend',
+    'drf_spectacular',
 
 ]
 
@@ -125,7 +126,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
+# STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # MEDIA_URL = 'media/'
 # MEDIA_ROOT = BASE_DIR / 'media'
@@ -151,6 +152,11 @@ REST_FRAMEWORK = {
         "anon": "10/minute",
         "user": "100/minute",
     },
+
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 SIMPLE_JWT = {
@@ -178,5 +184,12 @@ else:
         }
     }
 
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'JobTrackr API',
+    'DESCRIPTION': 'Backend API for Job Application Tracking System',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
+}
 
 

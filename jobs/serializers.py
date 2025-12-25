@@ -12,10 +12,12 @@ class JobSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'title',
+            'description',
             'location',
             'job_type',
             'salary',
+            'is_active',
             'recruiter_email',
-            'created_at'
+            'created_at',
         ]
-
+        read_only_fields = ['is_active', 'recruiter_email', 'created_at']

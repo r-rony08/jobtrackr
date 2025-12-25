@@ -1,13 +1,11 @@
 from django.urls import path
-from .views import protected_test, register_user
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from .views import MyTokenObtainPairView, recruiter_test
+from rest_framework_simplejwt.views import TokenRefreshView
+from .views import MyTokenObtainPairView, ProtectedTestView, RecruiterTestView,RegisterUserView
 
 urlpatterns = [
-    path('refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('protected/', protected_test, name='protected_test'),
-    path('register/', register_user, name='register_user'),
+    path('register/', RegisterUserView.as_view(), name='register_user'),
     path('login/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('recruiter-test/', recruiter_test),
-
+    path('refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('protected/', ProtectedTestView.as_view(), name='protected_test'),
+    path('recruiter-test/', RecruiterTestView.as_view(), name='recruiter_test'),
 ]

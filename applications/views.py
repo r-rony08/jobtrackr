@@ -1,140 +1,92 @@
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.generics import CreateAPIView,ListAPIView,UpdateAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import status
-from django.shortcuts import get_object_or_404
-from applications.models import Application
+from rest_framework.views import APIView
+from .models import Application
 from .serializers import ApplicationSerializer
 from jobs.models import Job
+from auth_app.permissions import IsUser
+from auth_app.permissions import IsRecruiter
+from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import extend_schema
 from django.db.models import Count
 
-# Apply to Job Users Only
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def apply_job(request, job_id):
-    if request.user.role != 'user':
-        return Response({"detail": "Only users can apply"}, status=status.HTTP_403_FORBIDDEN)
+class ApplyJobView(CreateAPIView):
+    serializer_class = ApplicationSerializer
+    permission_classes = [IsAuthenticated, IsUser]
 
-    job = get_object_or_404(Job, id=job_id, is_active=True)
+    @extend_schema(
+        request=ApplicationSerializer,
+        responses={201: ApplicationSerializer}
+    )
+    def perform_create(self, serializer):
+        job = get_object_or_404(Job, id=self.kwargs['job_id'], is_active=True)
 
-    # Prevent duplicate
-    if Application.objects.filter(job=job, user=request.user).exists():
-        return Response({"detail": "Already applied"}, status=status.HTTP_400_BAD_REQUEST)
+        if Application.objects.filter(job=job, user=self.request.user).exists():
+            raise ValueError("Already applied")
 
-    serializer = ApplicationSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
-    serializer.save(user=request.user, job=job)
+        serializer.save(
+            user=self.request.user,
+            job=job
+        )
 
-    return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 # View Applications (Recruiter Only)
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def recruiter_applications(request, job_id):
-    job = get_object_or_404(Job, id=job_id, recruiter=request.user)
-    applications = job.applications.all()
-    serializer = ApplicationSerializer(applications, many=True)
-    return Response(serializer.data)
+class RecruiterApplicationsView(ListAPIView):
+    serializer_class = ApplicationSerializer
+    permission_classes = [IsAuthenticated, IsRecruiter]
+
+    def get_queryset(self):
+        job = get_object_or_404(
+            Job,
+            id=self.kwargs['job_id'],
+            recruiter=self.request.user
+        )
+        return job.applications.select_related('user')
 
 
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework import status
-from django.shortcuts import get_object_or_404
-from django.db.models import Count
 
-from applications.models import Application
-from jobs.models import Job
+class UpdateApplicationStatusView(UpdateAPIView):
+    serializer_class = ApplicationSerializer
+    permission_classes = [IsAuthenticated, IsRecruiter]
+    queryset = Application.objects.all()
 
+    def perform_update(self, serializer):
+        serializer.save()
 
-@api_view(['GET', 'PATCH'])
-@permission_classes([IsAuthenticated])
-def application_analytics(request):
-    user = request.user
+class UserApplicationAnalyticsView(APIView):
+    permission_classes = [IsAuthenticated, IsUser]
 
-    # ---------- PATCH → Update application status ----------
-    if request.method == 'PATCH':
-        application_id = request.data.get('application_id')
-        new_status = request.data.get('status')
+    def get(self, request):
+        total = Application.objects.filter(user=request.user).count()
 
-        if not application_id or not new_status:
-            return Response(
-                {"success": False, "message": "application_id and status are required"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        application = get_object_or_404(
-            Application,
-            id=application_id,
-            user=user
+        status_breakdown = (
+            Application.objects
+            .filter(user=request.user)
+            .values('status')
+            .annotate(total=Count('id'))
         )
 
-        if new_status not in dict(Application.STATUS_CHOICES):
-            return Response(
-                {"success": False, "message": "Invalid status"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        application.status = new_status
-        application.save()
-
         return Response({
-            "success": True,
-            "message": "Application status updated"
+            "total_applications": total,
+            "status_breakdown": status_breakdown
         })
 
-    # ---------- GET → Analytics ----------
-    # Total jobs (for recruiter)
-    total_jobs = Job.objects.filter(recruiter=user).count() if getattr(user, 'role', None) == 'recruiter' else 0
 
-    # Total applications by user
-    total_applications = Application.objects.filter(user=user).count()
 
-    # Status-wise count
-    status_counts_qs = (
-        Application.objects
-        .filter(user=user)
-        .values('status')
-        .annotate(count=Count('id'))
-    )
-    status_counts = [{"status": item["status"], "total": item["count"]} for item in status_counts_qs]
+class RecruiterApplicationAnalyticsView(APIView):
+    permission_classes = [IsAuthenticated, IsRecruiter]
 
-    # Jobs by company
-    jobs_by_company_qs = (
-        Application.objects
-        .filter(user=user)
-        .values('job__title')
-        .annotate(count=Count('id'))
-    )
-    jobs_by_company = [{"job__title": item["job__title"], "total": item["count"]} for item in jobs_by_company_qs]
+    def get(self, request):
+        data = (
+            Application.objects
+            .filter(job__recruiter=request.user)
+            .values('status')
+            .annotate(total=Count('id'))
+        )
 
-    # Recent applications
-    recent_applications_qs = (
-        Application.objects
-        .filter(user=user)
-        .select_related('job')
-        .order_by('-applied_at')[:5]
-    )
-    recent_data = [
-        {
-            "job_title": app.job.title,
-            "status": app.status,
-            "applied_at": app.applied_at
-        }
-        for app in recent_applications_qs
-    ]
-
-    return Response({
-        "success": True,
-        "data": {
-            "total_jobs": total_jobs,
-            "total_applications": total_applications,
-            "status_breakdown": status_counts,
-            "jobs_by_company": jobs_by_company,
-            "recent_applications": recent_data
-        },
-        "message": "Analytics retrieved successfully"
-    })
+        return Response({
+            "applications_by_status": data
+        })
