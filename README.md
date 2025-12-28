@@ -9,7 +9,7 @@ The backend is containerized using Docker, Swagger and uses MySQL as the databas
 | Layer | Technology |
 | :--- | :--- |
 | **Backend** | Python, Django, Django REST Framework |
-| **Database** | MySQL |
+| **Database** | MySQL | Redis |
 | **Auth** | JWT (JSON Web Tokens) |
 | **Container** | Docker & Docker Compose |
 | **API Docs** | Swagger / OpenAPI |
@@ -34,9 +34,9 @@ This project follows an Agile sprint-based development approach with feature bra
 - [x] **Sprint 2:** Job application core module
 - [x] **Sprint 3:** Search, filter & pagination
 - [ ] **Sprint 4:** Frontend integration (Planned)
-- [ ] **Sprint 5:** Analytics dashboard
-- [ ] **Sprint 6:** Security & optimization
-- [ ] **Sprint 7:** Deployment & documentation
+- [x] **Sprint 5:** Analytics dashboard
+- [x] **Sprint 6:** Security & optimization
+- [ ] **Sprint 7:** Deployment & documentation (Planned)
 
 ##  Project Structure
 
@@ -55,7 +55,6 @@ jobtrackr/
 ## How to Run Locally
 ```bash
 git clone https://github.com/your-username/jobtrackr.git
-cd jobtrackr
 ```
 ### Create a .env file in the root directory
 ```ini
@@ -88,7 +87,7 @@ python manage.py migrate
 python manage.py runserver
 ```
 # API Documentation
-API Root: http://localhost:8000/api/v1/
+API Root: http://localhost:8000/api/v1/ <br>
 Swagger UI: http://127.0.0.1:8000/api/docs/
 
 ### Run Project Using Docker
