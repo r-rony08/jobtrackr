@@ -1,4 +1,4 @@
-from rest_framework.generics import CreateAPIView,DestroyAPIView,ListAPIView, RetrieveUpdateAPIView
+from rest_framework.generics import CreateAPIView,DestroyAPIView,ListAPIView, UpdateAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.pagination import PageNumberPagination
 from drf_spectacular.utils import extend_schema
@@ -42,10 +42,11 @@ class ListJobsView(ListAPIView):
 
 
 # Update Jobs
-class UpdateJobView(RetrieveUpdateAPIView):
+class UpdateJobView(UpdateAPIView):
     serializer_class = JobSerializer
     permission_classes = [IsAuthenticated, IsRecruiter, IsJobOwner]
     queryset = Job.objects.all()
+    http_method_names = ['patch']
 
     def perform_update(self, serializer):
         serializer.save()
