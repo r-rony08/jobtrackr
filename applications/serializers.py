@@ -20,3 +20,14 @@ class ApplicationSerializer(serializers.ModelSerializer):
             'status',
             'applied_at'
         ]
+
+class ApplicationStatusUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Application
+        fields = ["status"]
+
+    def validate_status(self, value):
+        allowed = ["applied", "interview", "offer", "rejected"]
+        if value not in allowed:
+            raise serializers.ValidationError("Invalid status")
+        return value

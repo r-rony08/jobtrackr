@@ -7,6 +7,12 @@ class JobSerializer(serializers.ModelSerializer):
         read_only=True
     )
 
+    salary = serializers.IntegerField(
+        min_value=0,
+        max_value=1_000_000,
+        required=False
+    )
+
     class Meta:
         model = Job
         fields = [

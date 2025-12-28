@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Application
-from .serializers import ApplicationSerializer
+from .serializers import ApplicationSerializer, ApplicationStatusUpdateSerializer
 from jobs.models import Job
 from auth_app.permissions import IsUser
 from auth_app.permissions import IsRecruiter
@@ -49,12 +49,11 @@ class RecruiterApplicationsView(ListAPIView):
 
 
 class UpdateApplicationStatusView(UpdateAPIView):
-    serializer_class = ApplicationSerializer
+    serializer_class = ApplicationStatusUpdateSerializer  
     permission_classes = [IsAuthenticated, IsRecruiter]
     queryset = Application.objects.all()
+    http_method_names = ['patch']
 
-    def perform_update(self, serializer):
-        serializer.save()
 
 class UserApplicationAnalyticsView(APIView):
     permission_classes = [IsAuthenticated, IsUser]
