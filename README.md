@@ -9,7 +9,7 @@ The backend is containerized using Docker, Swagger and uses MySQL as the databas
 | Layer | Technology |
 | :--- | :--- |
 | **Backend** | Python, Django, Django REST Framework |
-| **Database** | MySQL | Redis |
+| **Database** | MySQL, Redis |
 | **Auth** | JWT (JSON Web Tokens) |
 | **Container** | Docker & Docker Compose |
 | **API Docs** | Swagger / OpenAPI |
