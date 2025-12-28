@@ -47,6 +47,7 @@ jobtrackr/
 ├── jobs/            # Job functionality
 ├── profiles/        # User management
 ├── Dockerfile       # Docker config
+├── requirements.txt
 └── docker-compose.yml
 ```
 ## How to Run Locally
@@ -84,9 +85,11 @@ python manage.py migrate
 python manage.py runserver
 ```
 # API Endpoints
-### Authentication
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
 | `POST` | `/api/v1/auth/register/` | Register a new user |
 | `POST` | `/api/v1/auth/login/` | User login (JWT) |
+| `POST` | `/api/v1/auth/logout/` | User logout |
 ### Jobs
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
@@ -95,7 +98,6 @@ python manage.py runserver
 | `GET` | `/api/v1/jobs/{id}/` | Get specific job details |
 | `PUT` | `/api/v1/jobs/{id}/` | Update an existing job |
 | `DELETE` | `/api/v1/jobs/{id}/` | Soft delete a job posting |
-
 ### 📄 Applications
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
