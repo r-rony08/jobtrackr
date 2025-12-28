@@ -54,46 +54,52 @@ jobtrackr/
 
 ## How to Run Locally
 
-```bash
 git clone https://github.com/your-username/jobtrackr.git
 cd jobtrackr
 
-```bash
-python -m venv env
-env\Scripts\activate
-pip install -r requirements.txt
-python manage.py runserver
-
-## Create .env File
+### Create a .env file in the root directory
+```ini
 DEBUG=True
-SECRET_KEY=your django key
+SECRET_KEY=your django key password
 ALLOWED_HOSTS=127.0.0.1,localhost
 
+# Database Settings
 DB_NAME=jobtrackr_db
 DB_USER=jobtrackr_user
-DB_PASSWORD=strongpassword
+DB_PASSWORD=your_local_password
 DB_HOST=localhost
 DB_PORT=3306
 
-## Create database
-```bash
+# Create database
 CREATE DATABASE jobtrackr_db;
 
-## Run Migrations
-```bash
-python manage.py makemigrations
+# Activate Virtual Environment
+python -m venv env
+
+# On Windows:
+env\Scripts\activate
+
+# Install Dependencies
+pip install -r requirements.txt
+
+# Run Migrations and Start Server
 python manage.py migrate
 python manage.py runserver
 
-### Run Project Using Docker
-create .env.docker File
-DEBUG=True
-SECRET_KEY=django-insecure-change-this
-ALLOWED_HOSTS=127.0.0.1,localhost
+# API Documentation
+API Root: http://localhost:8000/api/v1/
+Swagger UI: http://127.0.0.1:8000/api/docs/
 
+### Run Project Using Docker
+
+# create .env.docker File
+```ini
+DEBUG=True
+SECRET_KEY=your django key password
+ALLOWED_HOSTS=127.0.0.1,localhost
 DB_NAME=jobtrackr_db
 DB_USER=jobtrackr_user
-DB_PASSWORD=strongpassword
+DB_PASSWORD=your_local_password
 DB_HOST=db
 DB_PORT=3306
 
@@ -102,8 +108,6 @@ docker compose up --build
 ## Run Migrations (Docker)
 docker compose exec backend python manage.py migrate
 
-API: http://localhost:8000/api/v1/
-Swagger Documentation: http://127.0.0.1:8000/api/docs/
 
 
 
