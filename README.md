@@ -87,7 +87,21 @@ python manage.py runserver
 ### Authentication
 | `POST` | `/api/v1/auth/register/` | Register a new user |
 | `POST` | `/api/v1/auth/login/` | User login (JWT) |
+### Jobs
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/v1/jobs/` | List all available jobs |
+| `POST` | `/api/v1/jobs/` | Create a new job listing |
+| `GET` | `/api/v1/jobs/{id}/` | Get specific job details |
+| `PUT` | `/api/v1/jobs/{id}/` | Update an existing job |
+| `DELETE` | `/api/v1/jobs/{id}/` | Soft delete a job posting |
 
+### 📄 Applications
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/api/v1/applications/` | Submit a job application |
+| `GET` | `/api/v1/applications/` | List user applications |
+| `PATCH` | `/api/v1/applications/{id}/status/` | Update application status |
 
 # API Documentation
 API Root: http://localhost:8000/api/v1/ <br>
