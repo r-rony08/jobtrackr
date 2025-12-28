@@ -2,15 +2,19 @@
 
 JobTrackr is a Django REST API project for managing and tracking platform designed to help job seekers manage applications, job postings, user profiles, track statuses, and analyze progress.
 The backend is containerized using Docker, Swagger and uses MySQL as the database.
-Project Status: 🎉 Backend Complete
-Live Demo: [Coming Soon]
+> **Project Status:** 🎉 Backend Complete
+---
+## 🛠 Tech Stack
 
-## Tech Stack
-- Backend: Python, Django, Django REST Framework
-- Frontend: HTML, CSS, JavaScript (planed)
-- Authentication: JWT 
-- Database: MySQL
-- Docker & Docker Compose, Swagger/OpenAPI
+| Layer | Technology |
+| :--- | :--- |
+| **Backend** | Python, Django, Django REST Framework |
+| **Database** | MySQL |
+| **Auth** | JWT (JSON Web Tokens) |
+| **Container** | Docker & Docker Compose |
+| **API Docs** | Swagger / OpenAPI |
+
+---
 
   ## Features
 
@@ -23,29 +27,30 @@ Live Demo: [Coming Soon]
 ## Project Workflow
 This project follows an Agile sprint-based development approach with feature branches and continuous Git integration.
 
-## Sprint Plan
-- Sprint 0: Project setup & planning
-- Sprint 1: Authentication system
-- Sprint 2: Job application core module
-- Sprint 3: Search, filter & pagination
-- Sprint 4: Frontend integration (Planned)
-- Sprint 5: Analytics dashboard
-- Sprint 6: Security & optimization
-- Sprint 7: Deployment & documentation (Planned)
+##  Sprint Plan (Agile)
 
-  ## Project Structure
+- [x] **Sprint 0:** Project setup & planning
+- [x] **Sprint 1:** Authentication system (JWT)
+- [x] **Sprint 2:** Job application core module
+- [x] **Sprint 3:** Search, filter & pagination
+- [ ] **Sprint 4:** Frontend integration (Planned)
+- [ ] **Sprint 5:** Analytics dashboard
+- [ ] **Sprint 6:** Security & optimization
+- [ ] **Sprint 7:** Deployment & documentation
+
+##  Project Structure
+
+```text
 jobtrackr/
-├── api/v1/              # API endpoints and versioning
-├── applications/        # Job application models and logic
-├── auth_app/           # Authentication system (JWT)
-├── backend/            # Core Django settings
-├── core/               # Shared utilities and base classes
-├── jobs/               # Job-related functionality
-├── profiles/           # User profile management
-├── Dockerfile          # Docker configuration
-├── docker-compose.yml  # Multi-container orchestration
-├── manage.py           # Django management script
-└── requirements.txt    # Python dependencies
+├── api/v1/          # API endpoints and versioning
+├── applications/    # Job application models
+├── auth_app/        # Authentication system
+├── backend/         # Core Django settings
+├── core/            # Shared utilities
+├── jobs/            # Job functionality
+├── profiles/        # User management
+├── Dockerfile       # Docker config
+└── docker-compose.yml
 
 ## How to Run Locally
 
