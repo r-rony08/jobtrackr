@@ -53,10 +53,10 @@ jobtrackr/
 └── docker-compose.yml
 
 ## How to Run Locally
-
+```bash
 git clone https://github.com/your-username/jobtrackr.git
 cd jobtrackr
-
+```
 ### Create a .env file in the root directory
 ```ini
 DEBUG=True
@@ -69,10 +69,12 @@ DB_USER=jobtrackr_user
 DB_PASSWORD=your_local_password
 DB_HOST=localhost
 DB_PORT=3306
-
-# Create database
+```
+** Create database
+```bash
 CREATE DATABASE jobtrackr_db;
-
+```
+```bash
 # Activate Virtual Environment
 python -m venv env
 
@@ -85,14 +87,14 @@ pip install -r requirements.txt
 # Run Migrations and Start Server
 python manage.py migrate
 python manage.py runserver
-
+```
 # API Documentation
 API Root: http://localhost:8000/api/v1/
 Swagger UI: http://127.0.0.1:8000/api/docs/
 
 ### Run Project Using Docker
 
-# create .env.docker File
+** create .env.docker File
 ```ini
 DEBUG=True
 SECRET_KEY=your django key password
@@ -102,12 +104,13 @@ DB_USER=jobtrackr_user
 DB_PASSWORD=your_local_password
 DB_HOST=db
 DB_PORT=3306
-
-## Build and Start Containers
+```
+```bash
+** Build and Start Containers
 docker compose up --build
-## Run Migrations (Docker)
+** Run Migrations (Docker)
 docker compose exec backend python manage.py migrate
-
+```
 
 
 
