@@ -13,11 +13,9 @@ The backend is containerized using Docker, Swagger and uses MySQL as the databas
 | **Auth** | JWT (JSON Web Tokens) |
 | **Container** | Docker & Docker Compose |
 | **API Docs** | Swagger / OpenAPI |
-
 ---
 
   ## Features
-
 - Recruiter job management (create, update, soft delete)
 - Job listing and search
 - User profile management
@@ -28,7 +26,6 @@ The backend is containerized using Docker, Swagger and uses MySQL as the databas
 This project follows an Agile sprint-based development approach with feature branches and continuous Git integration.
 
 ##  Sprint Plan (Agile)
-
 - [x] **Sprint 0:** Project setup & planning
 - [x] **Sprint 1:** Authentication system (JWT)
 - [x] **Sprint 2:** Job application core module
@@ -86,6 +83,25 @@ pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
 ```
+### 📌 API Endpoints
+Authentication
+Method	Endpoint	Description
+POST	/api/v1/auth/register/	Register user
+POST	/api/v1/auth/login/	Login
+POST	/api/v1/auth/logout/	Logout
+Jobs
+Method	Endpoint	Description
+GET	/api/v1/jobs/	List jobs
+POST	/api/v1/jobs/	Create job
+GET	/api/v1/jobs/{id}/	Job details
+PUT	/api/v1/jobs/{id}/	Update job
+DELETE	/api/v1/jobs/{id}/	Soft delete job
+Applications
+Method	Endpoint	Description
+POST	/api/v1/applications/	Apply for job
+GET	/api/v1/applications/	List applications
+PATCH	/api/v1/applications/application/{id}/status/	Update application status
+
 # API Documentation
 API Root: http://localhost:8000/api/v1/ <br>
 Swagger UI: http://127.0.0.1:8000/api/docs/
