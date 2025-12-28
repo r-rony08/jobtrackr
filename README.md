@@ -83,24 +83,11 @@ pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
 ```
-### 📌 API Endpoints
-Authentication
-Method	Endpoint	Description
-POST	/api/v1/auth/register/	Register user
-POST	/api/v1/auth/login/	Login
-POST	/api/v1/auth/logout/	Logout
-Jobs
-Method	Endpoint	Description
-GET	/api/v1/jobs/	List jobs
-POST	/api/v1/jobs/	Create job
-GET	/api/v1/jobs/{id}/	Job details
-PUT	/api/v1/jobs/{id}/	Update job
-DELETE	/api/v1/jobs/{id}/	Soft delete job
-Applications
-Method	Endpoint	Description
-POST	/api/v1/applications/	Apply for job
-GET	/api/v1/applications/	List applications
-PATCH	/api/v1/applications/application/{id}/status/	Update application status
+# API Endpoints
+### Authentication
+| `POST` | `/api/v1/auth/register/` | Register a new user |
+| `POST` | `/api/v1/auth/login/` | User login (JWT) |
+
 
 # API Documentation
 API Root: http://localhost:8000/api/v1/ <br>
